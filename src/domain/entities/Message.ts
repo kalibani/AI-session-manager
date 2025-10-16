@@ -1,4 +1,4 @@
-export type MessageRole = 'user' | 'assistant';
+export type MessageRole = "user" | "assistant";
 
 export interface Message {
   id: string;
@@ -13,7 +13,3 @@ export type CreateMessageInput = {
   role: MessageRole;
   content: string;
 };
-
-
-
-

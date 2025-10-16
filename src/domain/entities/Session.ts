@@ -20,7 +20,3 @@ export type UpdateSessionInput = {
   id: string;
   title?: string;
 };
-
-
-
-

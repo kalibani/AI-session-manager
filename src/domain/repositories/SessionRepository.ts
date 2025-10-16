@@ -8,28 +8,24 @@ import type {
 import { logError, ErrorCategory } from "@/services/sentry";
 import type { Database } from "@/types/supabase";
 
+type SessionRow = Database["public"]["Tables"]["sessions"]["Row"];
+type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
+
 export class SessionRepository {
   async getAll(userId: string): Promise<SessionWithLastMessage[]> {
     try {
       const { data: sessions, error } = await supabase
-        .from<"sessions", Database["public"]["Tables"]["sessions"]>("sessions")
-        .select(
-          `
-          id,
-          user_id,
-          title,
-          created_at,
-          updated_at
-        `
-        )
+        .from("sessions")
+        .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      if (!sessions) return [];
 
       // Get last message for each session
       const sessionsWithMessages = await Promise.all(
-        (sessions || []).map(async (session) => {
+        sessions.map(async (session: SessionRow) => {
           const { data: lastMessage } = await supabase
             .from("messages")
             .select("content, created_at")
@@ -38,14 +34,19 @@ export class SessionRepository {
             .limit(1)
             .single();
 
+          const msgData = lastMessage as Pick<
+            MessageRow,
+            "content" | "created_at"
+          > | null;
+
           return {
             id: session.id,
             userId: session.user_id,
             title: session.title,
             createdAt: session.created_at,
             updatedAt: session.updated_at,
-            lastMessage: lastMessage?.content,
-            lastMessageAt: lastMessage?.created_at,
+            lastMessage: msgData?.content,
+            lastMessageAt: msgData?.created_at,
           };
         })
       );
@@ -76,12 +77,16 @@ export class SessionRepository {
         throw error;
       }
 
+      if (!data) return null;
+
+      const sessionData = data as SessionRow;
+
       return {
-        id: data.id,
-        userId: data.user_id,
-        title: data.title,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: sessionData.id,
+        userId: sessionData.user_id,
+        title: sessionData.title,
+        createdAt: sessionData.created_at,
+        updatedAt: sessionData.updated_at,
       };
     } catch (error) {
       const err = error as Error;
@@ -96,23 +101,28 @@ export class SessionRepository {
 
   async create(input: CreateSessionInput): Promise<Session> {
     try {
+      const insertData = {
+        user_id: input.userId,
+        title: input.title,
+      };
+
       const { data, error } = await supabase
         .from("sessions")
-        .insert({
-          user_id: input.userId,
-          title: input.title,
-        })
+        .insert(insertData as any)
         .select()
         .single();
 
       if (error) throw error;
+      if (!data) throw new Error("Failed to create session");
+
+      const sessionData = data as SessionRow;
 
       return {
-        id: data.id,
-        userId: data.user_id,
-        title: data.title,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: sessionData.id,
+        userId: sessionData.user_id,
+        title: sessionData.title,
+        createdAt: sessionData.created_at,
+        updatedAt: sessionData.updated_at,
       };
     } catch (error) {
       const err = error as Error;
@@ -127,24 +137,25 @@ export class SessionRepository {
 
   async update(input: UpdateSessionInput, userId: string): Promise<Session> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("sessions")
-        .update({
-          title: input.title,
-        })
+        .update({ title: input.title })
         .eq("id", input.id)
         .eq("user_id", userId)
         .select()
         .single();
 
       if (error) throw error;
+      if (!data) throw new Error("Failed to update session");
+
+      const sessionData = data as SessionRow;
 
       return {
-        id: data.id,
-        userId: data.user_id,
-        title: data.title,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: sessionData.id,
+        userId: sessionData.user_id,
+        title: sessionData.title,
+        createdAt: sessionData.created_at,
+        updatedAt: sessionData.updated_at,
       };
     } catch (error) {
       const err = error as Error;

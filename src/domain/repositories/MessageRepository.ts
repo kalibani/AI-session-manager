@@ -1,6 +1,10 @@
 import { supabase } from "@/services/db";
 import type { Message, CreateMessageInput } from "@/domain/entities/Message";
+import type { Database } from "@/types/supabase";
 import { logError, ErrorCategory } from "@/services/sentry";
+
+type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
+type MessageInsert = Database["public"]["Tables"]["messages"]["Insert"];
 
 export class MessageRepository {
   async getBySessionId(sessionId: string, userId: string): Promise<Message[]> {
@@ -24,11 +28,12 @@ export class MessageRepository {
         .order("created_at", { ascending: true });
 
       if (error) throw error;
+      if (!data) return [];
 
-      return (data || []).map((msg) => ({
+      return data.map((msg: MessageRow) => ({
         id: msg.id,
         sessionId: msg.session_id,
-        role: msg.role,
+        role: msg.role as "user" | "assistant",
         content: msg.content,
         createdAt: msg.created_at,
       }));
@@ -57,24 +62,29 @@ export class MessageRepository {
         throw new Error("Session not found or access denied");
       }
 
+      const insertData = {
+        session_id: input.sessionId,
+        role: input.role,
+        content: input.content,
+      };
+
       const { data, error } = await supabase
         .from("messages")
-        .insert({
-          session_id: input.sessionId,
-          role: input.role,
-          content: input.content,
-        })
+        .insert(insertData as any)
         .select()
         .single();
 
       if (error) throw error;
+      if (!data) throw new Error("Failed to create message");
+
+      const messageData = data as MessageRow;
 
       return {
-        id: data.id,
-        sessionId: data.session_id,
-        role: data.role,
-        content: data.content,
-        createdAt: data.created_at,
+        id: messageData.id,
+        sessionId: messageData.session_id,
+        role: messageData.role as "user" | "assistant",
+        content: messageData.content,
+        createdAt: messageData.created_at,
       };
     } catch (error) {
       const err = error as Error;

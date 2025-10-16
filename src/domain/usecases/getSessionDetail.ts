@@ -1,7 +1,7 @@
-import { sessionRepository } from '@/domain/repositories/SessionRepository';
-import { messageRepository } from '@/domain/repositories/MessageRepository';
-import type { Session } from '@/domain/entities/Session';
-import type { Message } from '@/domain/entities/Message';
+import { sessionRepository } from "@/domain/repositories/SessionRepository";
+import { messageRepository } from "@/domain/repositories/MessageRepository";
+import type { Session } from "@/domain/entities/Session";
+import type { Message } from "@/domain/entities/Message";
 
 export interface SessionDetail {
   session: Session;
@@ -25,7 +25,3 @@ export const getSessionDetail = async (
     messages,
   };
 };
-
-
-
-

@@ -1,7 +1,7 @@
-import { messageRepository } from '@/domain/repositories/MessageRepository';
-import { generateAIResponse } from '@/services/gemini';
-import type { Message } from '@/domain/entities/Message';
-import { logError, ErrorCategory } from '@/services/sentry';
+import { messageRepository } from "@/domain/repositories/MessageRepository";
+import { generateAIResponse } from "@/services/gemini";
+import type { Message } from "@/domain/entities/Message";
+import { logError, ErrorCategory } from "@/services/sentry";
 
 export interface AddMessageInput {
   sessionId: string;
@@ -24,7 +24,7 @@ export const addMessage = async (
     const userMessage = await messageRepository.create(
       {
         sessionId: input.sessionId,
-        role: 'user',
+        role: "user",
         content: input.content,
       },
       input.userId
@@ -48,7 +48,7 @@ export const addMessage = async (
     const aiMessage = await messageRepository.create(
       {
         sessionId: input.sessionId,
-        role: 'assistant',
+        role: "assistant",
         content: aiResponse.content,
       },
       input.userId
@@ -66,14 +66,10 @@ export const addMessage = async (
       category: ErrorCategory.API,
       userId: input.userId,
       additionalData: {
-        operation: 'addMessage',
+        operation: "addMessage",
         sessionId: input.sessionId,
       },
     });
     throw err;
   }
 };
-
-
-
-

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useSessionDetail } from "@/hooks/useSessionDetail";
 import { MessageInput } from "./MessageInput";
+import { MarkdownMessage } from "./MarkdownMessage";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, User, Bot, RefreshCw } from "lucide-react";
@@ -102,10 +103,16 @@ export function SessionDetail({ sessionId }: SessionDetailProps) {
                         : "bg-muted"
                     )}
                   >
-                    <p className="whitespace-pre-wrap break-words">
-                      {message.content}
-                    </p>
-                    <p className="text-xs mt-1 opacity-70">
+                    {message.role === "assistant" ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <MarkdownMessage content={message.content} />
+                      </div>
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap break-words mb-0">
+                        {message.content}
+                      </p>
+                    )}
+                    <p className="text-xs mt-2 opacity-70">
                       {formatDistanceToNow(new Date(message.createdAt), {
                         addSuffix: true,
                       })}
