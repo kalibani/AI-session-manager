@@ -44,42 +44,23 @@ export const useSessionDetail = (sessionId: string) => {
     }),
     onFinish: async ({ message }) => {
       try {
-        console.log("🎉 Streaming finished, saving to DB");
-        console.log("📋 Message details:", {
-          role: message.role,
-          partsCount: message.parts?.length,
-          hasUser: !!userRef.current,
-          userId: userRef.current?.id,
-          sessionId,
-        });
-
         if (!userRef.current) {
-          console.error("❌ No user available for saving");
           return;
         }
 
         if (message.role !== "assistant") {
-          console.log("ℹ️ Skipping save - message role is:", message.role);
           return;
         }
 
-        console.log("🔍 Extracting content from message parts...");
         const content = message.parts
           .filter((part: any) => part.type === "text")
           .map((part: any) => part.text)
           .join("");
 
-        console.log("💾 Content extracted:", {
-          length: content.length,
-          preview: content.substring(0, 100),
-        });
-
         if (!content || content.trim().length === 0) {
-          console.error("❌ No content to save!");
           return;
         }
 
-        console.log("💾 Calling messageRepository.create...");
         const savedMessage = await messageRepository.create(
           {
             sessionId,
@@ -88,18 +69,11 @@ export const useSessionDetail = (sessionId: string) => {
           },
           userRef.current.id
         );
-
-        console.log("✅ AI message saved with ID:", savedMessage.id);
-        console.log(
-          "✨ Message persisted to DB (no refetch needed - already in UI)"
-        );
       } catch (error) {
-        console.error("❌ CRITICAL: onFinish callback error:", error);
         toast.error("Failed to save message");
       }
     },
     onError: () => {
-      console.error("❌ Chat error");
       toast.error("Failed to get AI response");
     },
   });
@@ -109,7 +83,6 @@ export const useSessionDetail = (sessionId: string) => {
   // ============================================
   const fetchDetail = useCallback(async () => {
     if (!user || !sessionId) {
-      console.log("⚠️ No user or sessionId");
       setLoading(false);
       return [];
     }
@@ -117,17 +90,13 @@ export const useSessionDetail = (sessionId: string) => {
     try {
       setLoading(true);
       setError(null);
-      console.log("🔍 Fetching session details for:", sessionId);
       const data = await getSessionDetail(sessionId, user.id);
       setDetail(data);
 
       if (!data) {
-        console.log("⚠️ No data returned from getSessionDetail");
         setLoading(false);
         return [];
       }
-
-      console.log("📨 Loaded", data.messages.length, "messages from DB");
 
       const formattedMessages = data.messages
         .filter((msg) => msg.content && msg.content.trim().length > 0)
@@ -142,16 +111,10 @@ export const useSessionDetail = (sessionId: string) => {
           ],
         }));
 
-      console.log(
-        "✅ Formatted",
-        formattedMessages.length,
-        "messages for display"
-      );
       setLoading(false);
       return formattedMessages;
     } catch (err) {
       const error = err as Error;
-      console.error("❌ Error fetching session detail:", error);
       setError(error.message);
       toast.error("Failed to load session");
       setLoading(false);
@@ -161,19 +124,11 @@ export const useSessionDetail = (sessionId: string) => {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      console.log("📤 sendMessage called with:", content.substring(0, 50));
-
       if (!user || !sessionId || status === "streaming") {
-        console.log("⚠️ Cannot send - status:", {
-          user: !!user,
-          sessionId,
-          status,
-        });
         return;
       }
 
       try {
-        console.log("💾 Saving user message to DB...");
         const userMessage = await messageRepository.create(
           {
             sessionId,
@@ -182,9 +137,6 @@ export const useSessionDetail = (sessionId: string) => {
           },
           user.id
         );
-        console.log("✅ User message saved with ID:", userMessage.id);
-
-        console.log("🚀 Triggering AI chat...");
         chatSendMessage({
           role: "user",
           parts: [
@@ -195,7 +147,6 @@ export const useSessionDetail = (sessionId: string) => {
           ],
         } as any);
       } catch (error) {
-        console.error("❌ Failed to send message:", error);
         toast.error("Failed to send message");
       }
     },
@@ -215,33 +166,17 @@ export const useSessionDetail = (sessionId: string) => {
   // Load messages ONLY when we have both user and sessionId
   useEffect(() => {
     if (!user || !sessionId) {
-      console.log("⚠️ Waiting for user and sessionId...", {
-        hasUser: !!user,
-        sessionId,
-      });
-      // DON'T clear messages - just wait for auth to load
       return;
     }
 
     const loadMessages = async () => {
-      console.log("🔄 Initial load triggered for session:", sessionId);
       const messages = await fetchDetail();
-      console.log("📦 Received messages:", messages.length);
-
-      // ALWAYS set the messages, even if empty array
-      console.log("💾 Setting", messages.length, "messages to chat state");
       setChatMessages(messages as any);
     };
 
     loadMessages();
-    // Only re-run when sessionId or userId actually changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, user?.id]);
-
-  // Log when chatMessages changes
-  useEffect(() => {
-    console.log("📺 Chat messages updated:", chatMessages.length, "messages");
-  }, [chatMessages.length]);
 
   // ============================================
   // 5. RETURN VALUES

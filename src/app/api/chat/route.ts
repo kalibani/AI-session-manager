@@ -9,14 +9,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { messages } = body;
 
-    console.log(
-      "[API] Received chat request with",
-      messages?.length,
-      "messages"
-    );
-
     if (!messages || !Array.isArray(messages)) {
-      console.error("[API] Invalid messages array");
       return NextResponse.json(
         { error: "Messages array is required" },
         { status: 400 }
@@ -49,21 +42,7 @@ export async function POST(req: Request) {
       )
       .filter((msg) => msg.content.trim().length > 0); // Remove empty messages
 
-    console.log(
-      "[API] Calling AI with formatted messages:",
-      formattedMessages.length
-    );
-    console.log(
-      "[API] Messages:",
-      formattedMessages.map((m) => ({
-        role: m.role,
-        contentLength: m.content.length,
-        preview: m.content.substring(0, 50),
-      }))
-    );
-
     if (formattedMessages.length === 0) {
-      console.error("[API] No valid messages to send");
       return NextResponse.json(
         { error: "No valid messages provided" },
         { status: 400 }
@@ -77,13 +56,10 @@ export async function POST(req: Request) {
       temperature: 0.7,
     });
 
-    console.log("[API] Stream created successfully");
-
     // Return the UI message stream response for useChat
     return result.toUIMessageStreamResponse();
   } catch (error) {
     const err = error as Error;
-    console.error("[API] Error:", err);
     return NextResponse.json(
       { error: err.message || "Internal server error" },
       { status: 500 }
