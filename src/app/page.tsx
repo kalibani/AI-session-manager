@@ -18,7 +18,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -29,7 +29,10 @@ export default function Home() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[600px]">
+    <div
+      className="flex items-center justify-center -mx-4 -my-8 py-8 bg-gradient-to-br from-background via-background to-muted/20"
+      style={{ minHeight: "calc(100vh - 73px - 73px)" }}
+    >
       <AuthForm />
     </div>
   );

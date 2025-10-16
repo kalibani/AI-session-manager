@@ -47,7 +47,7 @@ export default function RootLayout({
             <main className="flex-1 container mx-auto px-4 py-8">
               {children}
             </main>
-            <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+            <footer className="border-t py-4 text-center text-sm text-muted-foreground">
               <p>Kautzar Alibani all rights reserved</p>
             </footer>
           </div>
