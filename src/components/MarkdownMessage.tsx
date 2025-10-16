@@ -22,36 +22,36 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
       remarkPlugins={[remarkGfm]}
       components={{
         // Headings
-        h1: ({ node, ...props }) => (
+        h1: ({ ...props }) => (
           <h1 className="text-2xl font-bold mt-4 mb-2" {...props} />
         ),
-        h2: ({ node, ...props }) => (
+        h2: ({ ...props }) => (
           <h2 className="text-xl font-bold mt-3 mb-2" {...props} />
         ),
-        h3: ({ node, ...props }) => (
+        h3: ({ ...props }) => (
           <h3 className="text-lg font-semibold mt-2 mb-1" {...props} />
         ),
 
         // Paragraphs
-        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+        p: ({ ...props }) => <p className="mb-2 last:mb-0" {...props} />,
 
         // Lists
-        ul: ({ node, ...props }) => (
+        ul: ({ ...props }) => (
           <ul
             className="list-disc list-outside ml-4 mb-2 space-y-1"
             {...props}
           />
         ),
-        ol: ({ node, ...props }) => (
+        ol: ({ ...props }) => (
           <ol
             className="list-decimal list-outside ml-4 mb-2 space-y-1"
             {...props}
           />
         ),
-        li: ({ node, ...props }) => <li className="ml-1" {...props} />,
+        li: ({ ...props }) => <li className="ml-1" {...props} />,
 
         // Links
-        a: ({ node, ...props }) => (
+        a: ({ ...props }) => (
           <a
             className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline"
             target="_blank"
@@ -61,22 +61,23 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
         ),
 
         // Inline code
-        code: ({ node, inline, className, children, ...props }: any) => {
+        code: ({ className, children, ...props }: any) => {
           const match = /language-(\w+)/.exec(className || "");
           const language = match ? match[1] : "";
+          const isCodeBlock = language && String(children).includes("\n");
 
-          return !inline && language ? (
+          return isCodeBlock ? (
             // Code block with syntax highlighting
             <div className="my-3 rounded-lg overflow-hidden">
               <div className="bg-gray-800 dark:bg-gray-900 px-4 py-2 text-xs text-gray-300 font-mono">
                 {language}
               </div>
               <SyntaxHighlighter
-                style={codeTheme}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                style={codeTheme as any}
                 language={language}
                 PreTag="div"
                 className="!mt-0 !rounded-t-none text-sm"
-                {...props}
               >
                 {String(children).replace(/\n$/, "")}
               </SyntaxHighlighter>
@@ -93,7 +94,7 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
         },
 
         // Blockquotes
-        blockquote: ({ node, ...props }) => (
+        blockquote: ({ ...props }) => (
           <blockquote
             className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic my-2 text-gray-700 dark:text-gray-300"
             {...props}
@@ -101,7 +102,7 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
         ),
 
         // Horizontal rules
-        hr: ({ node, ...props }) => (
+        hr: ({ ...props }) => (
           <hr
             className="my-4 border-gray-300 dark:border-gray-600"
             {...props}
@@ -109,7 +110,7 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
         ),
 
         // Tables
-        table: ({ node, ...props }) => (
+        table: ({ ...props }) => (
           <div className="overflow-x-auto my-3">
             <table
               className="min-w-full border border-gray-300 dark:border-gray-600"
@@ -117,16 +118,16 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
             />
           </div>
         ),
-        thead: ({ node, ...props }) => (
+        thead: ({ ...props }) => (
           <thead className="bg-gray-100 dark:bg-gray-800" {...props} />
         ),
-        th: ({ node, ...props }) => (
+        th: ({ ...props }) => (
           <th
             className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left font-semibold"
             {...props}
           />
         ),
-        td: ({ node, ...props }) => (
+        td: ({ ...props }) => (
           <td
             className="border border-gray-300 dark:border-gray-600 px-4 py-2"
             {...props}
@@ -134,10 +135,8 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
         ),
 
         // Strong and emphasis
-        strong: ({ node, ...props }) => (
-          <strong className="font-bold" {...props} />
-        ),
-        em: ({ node, ...props }) => <em className="italic" {...props} />,
+        strong: ({ ...props }) => <strong className="font-bold" {...props} />,
+        em: ({ ...props }) => <em className="italic" {...props} />,
       }}
     >
       {content}

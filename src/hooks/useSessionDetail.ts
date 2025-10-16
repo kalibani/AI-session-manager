@@ -5,7 +5,6 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { getSessionDetail } from "@/domain/usecases/getSessionDetail";
 import { messageRepository } from "@/domain/repositories/MessageRepository";
-import type { Message } from "@/types";
 import type { SessionDetail } from "@/domain/usecases/getSessionDetail";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
@@ -52,6 +51,7 @@ export const useSessionDetail = (sessionId: string) => {
           return;
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const content = message.parts
           .filter((part: any) => part.type === "text")
           .map((part: any) => part.text)
@@ -61,7 +61,7 @@ export const useSessionDetail = (sessionId: string) => {
           return;
         }
 
-        const savedMessage = await messageRepository.create(
+        await messageRepository.create(
           {
             sessionId,
             role: "assistant",
@@ -69,7 +69,7 @@ export const useSessionDetail = (sessionId: string) => {
           },
           userRef.current.id
         );
-      } catch (error) {
+      } catch {
         toast.error("Failed to save message");
       }
     },
@@ -129,7 +129,7 @@ export const useSessionDetail = (sessionId: string) => {
       }
 
       try {
-        const userMessage = await messageRepository.create(
+        await messageRepository.create(
           {
             sessionId,
             role: "user",
@@ -145,8 +145,8 @@ export const useSessionDetail = (sessionId: string) => {
               text: content,
             },
           ],
-        } as any);
-      } catch (error) {
+        });
+      } catch {
         toast.error("Failed to send message");
       }
     },
@@ -156,7 +156,7 @@ export const useSessionDetail = (sessionId: string) => {
   const refreshDetail = useCallback(async () => {
     const messages = await fetchDetail();
     if (messages && messages.length > 0) {
-      setChatMessages(messages as any);
+      setChatMessages(messages);
     }
   }, [fetchDetail, setChatMessages]);
 
@@ -171,7 +171,7 @@ export const useSessionDetail = (sessionId: string) => {
 
     const loadMessages = async () => {
       const messages = await fetchDetail();
-      setChatMessages(messages as any);
+      setChatMessages(messages);
     };
 
     loadMessages();
@@ -185,6 +185,7 @@ export const useSessionDetail = (sessionId: string) => {
     id: msg.id,
     sessionId,
     role: msg.role as "user" | "assistant",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: msg.parts
       .filter((part: any) => part.type === "text")
       .map((part: any) => part.text)

@@ -101,11 +101,12 @@ export class SessionRepository {
 
   async create(input: CreateSessionInput): Promise<Session> {
     try {
-      const insertData = {
+      const insertData: Database["public"]["Tables"]["sessions"]["Insert"] = {
         user_id: input.userId,
         title: input.title,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from("sessions")
         .insert(insertData as any)
@@ -137,9 +138,14 @@ export class SessionRepository {
 
   async update(input: UpdateSessionInput, userId: string): Promise<Session> {
     try {
+      const updateData: Database["public"]["Tables"]["sessions"]["Update"] = {
+        title: input.title,
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("sessions")
-        .update({ title: input.title })
+        .update(updateData)
         .eq("id", input.id)
         .eq("user_id", userId)
         .select()

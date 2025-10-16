@@ -4,7 +4,6 @@ import type { Database } from "@/types/supabase";
 import { logError, ErrorCategory } from "@/services/sentry";
 
 type MessageRow = Database["public"]["Tables"]["messages"]["Row"];
-type MessageInsert = Database["public"]["Tables"]["messages"]["Insert"];
 
 export class MessageRepository {
   async getBySessionId(sessionId: string, userId: string): Promise<Message[]> {
@@ -62,12 +61,13 @@ export class MessageRepository {
         throw new Error("Session not found or access denied");
       }
 
-      const insertData = {
+      const insertData: Database["public"]["Tables"]["messages"]["Insert"] = {
         session_id: input.sessionId,
         role: input.role,
         content: input.content,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from("messages")
         .insert(insertData as any)
