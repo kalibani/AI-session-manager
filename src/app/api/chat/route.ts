@@ -1,6 +1,7 @@
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { NextResponse } from "next/server";
+import { logError, ErrorCategory } from "@/services/sentry";
 
 export const runtime = "edge";
 
@@ -51,6 +52,18 @@ export async function POST(req: Request) {
 
     // Simulate error if enabled (40% chance)
     if (errorSimulation && Math.random() < 0.4) {
+      const simulatedError = new Error("Simulated API failure for testing");
+
+      // Log to Sentry
+      logError(simulatedError, {
+        category: ErrorCategory.API,
+        additionalData: {
+          simulated: true,
+          messagesCount: formattedMessages.length,
+          feature: "error_simulation",
+        },
+      });
+
       return NextResponse.json(
         { error: "Simulated API failure for testing" },
         { status: 500 }
