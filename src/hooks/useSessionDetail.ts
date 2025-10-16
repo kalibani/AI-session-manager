@@ -20,7 +20,6 @@ export const useSessionDetail = (sessionId: string) => {
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [shouldRefetch, setShouldRefetch] = useState(0);
 
   // Keep userRef in sync with user
   useEffect(() => {
@@ -91,8 +90,9 @@ export const useSessionDetail = (sessionId: string) => {
         );
 
         console.log("✅ AI message saved with ID:", savedMessage.id);
-        console.log("🔄 Triggering refetch...");
-        setShouldRefetch((prev) => prev + 1);
+        console.log(
+          "✨ Message persisted to DB (no refetch needed - already in UI)"
+        );
       } catch (error) {
         console.error("❌ CRITICAL: onFinish callback error:", error);
         toast.error("Failed to save message");
@@ -197,7 +197,6 @@ export const useSessionDetail = (sessionId: string) => {
       } catch (error) {
         console.error("❌ Failed to send message:", error);
         toast.error("Failed to send message");
-        setShouldRefetch((prev) => prev + 1);
       }
     },
     [user, sessionId, status, chatSendMessage]
@@ -238,27 +237,6 @@ export const useSessionDetail = (sessionId: string) => {
     // Only re-run when sessionId or userId actually changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, user?.id]);
-
-  // Refetch when AI message is saved
-  useEffect(() => {
-    if (shouldRefetch > 0) {
-      console.log("🔄 Refetch triggered (count:", shouldRefetch, ")");
-      const loadMessages = async () => {
-        console.log("🔄 Fetching updated messages from DB...");
-        const messages = await fetchDetail();
-        console.log("📦 Refetch result:", messages.length, "messages");
-
-        if (messages && messages.length > 0) {
-          console.log("💾 Re-setting", messages.length, "messages after save");
-          setChatMessages(messages as any);
-        } else {
-          console.log("⚠️ No messages returned on refetch");
-        }
-      };
-      loadMessages();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch]);
 
   // Log when chatMessages changes
   useEffect(() => {

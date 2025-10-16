@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { SessionDetail } from '@/components/SessionDetail';
-import { use } from 'react';
+import { SessionDetail } from "@/components/SessionDetail";
+import { use } from "react";
 
 export default function SessionDetailPage({
   params,
@@ -9,10 +9,6 @@ export default function SessionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  
+
   return <SessionDetail sessionId={id} />;
 }
-
-
-
-

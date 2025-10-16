@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { SessionList } from '@/components/SessionList';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { SessionList } from "@/components/SessionList";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 export default function SessionsPage() {
   const { user, signOut } = useAuth();
@@ -27,7 +27,3 @@ export default function SessionsPage() {
     </div>
   );
 }
-
-
-
-
