@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import { Toaster } from "@/components/ui/sonner";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
+import { SettingsToggle } from "@/components/SettingsToggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,21 +39,26 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen flex flex-col">
-            <header className="border-b">
-              <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                <h1 className="text-xl font-bold">AI Session Manager</h1>
-                <DarkModeToggle />
-              </div>
-            </header>
-            <main className="flex-1 container mx-auto px-4 py-8">
-              {children}
-            </main>
-            <footer className="border-t py-4 text-center text-sm text-muted-foreground">
-              <p>Kautzar Alibani all rights reserved</p>
-            </footer>
-          </div>
-          <Toaster />
+          <SettingsProvider>
+            <div className="min-h-screen flex flex-col">
+              <header className="border-b">
+                <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+                  <h1 className="text-xl font-bold">AI Session Manager</h1>
+                  <div className="flex items-center gap-2">
+                    <SettingsToggle />
+                    <DarkModeToggle />
+                  </div>
+                </div>
+              </header>
+              <main className="flex-1 container mx-auto px-4 py-8">
+                {children}
+              </main>
+              <footer className="border-t py-4 text-center text-sm text-muted-foreground">
+                <p>Kautzar Alibani all rights reserved</p>
+              </footer>
+            </div>
+            <Toaster />
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

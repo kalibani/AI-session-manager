@@ -7,6 +7,7 @@ import { getSessionDetail } from "@/domain/usecases/getSessionDetail";
 import { messageRepository } from "@/domain/repositories/MessageRepository";
 import type { SessionDetail } from "@/domain/usecases/getSessionDetail";
 import { useAuth } from "./useAuth";
+import { useSettings } from "@/contexts/SettingsContext";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
 
@@ -15,6 +16,7 @@ export const useSessionDetail = (sessionId: string) => {
   // 1. ALL useState HOOKS FIRST
   // ============================================
   const { user } = useAuth();
+  const { errorSimulationEnabled } = useSettings();
   const userRef = useRef<User | null>(null);
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,7 @@ export const useSessionDetail = (sessionId: string) => {
       api: "/api/chat",
       body: {
         sessionId,
+        errorSimulation: errorSimulationEnabled,
       },
     }),
     onFinish: async ({ message }) => {

@@ -7,7 +7,7 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages } = body;
+    const { messages, errorSimulation } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -46,6 +46,14 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "No valid messages provided" },
         { status: 400 }
+      );
+    }
+
+    // Simulate error if enabled (15% chance)
+    if (errorSimulation && Math.random() < 0.15) {
+      return NextResponse.json(
+        { error: "Simulated API failure for testing" },
+        { status: 500 }
       );
     }
 

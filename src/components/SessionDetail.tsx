@@ -2,11 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { useSessionDetail } from "@/hooks/useSessionDetail";
+import { useSettings } from "@/contexts/SettingsContext";
 import { MessageInput } from "./MessageInput";
 import { MarkdownMessage } from "./MarkdownMessage";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, User, Bot, RefreshCw } from "lucide-react";
+import { ArrowLeft, Loader2, User, Bot, RefreshCw, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -18,6 +19,7 @@ interface SessionDetailProps {
 export function SessionDetail({ sessionId }: SessionDetailProps) {
   const { session, messages, loading, sending, sendMessage, refreshDetail } =
     useSessionDetail(sessionId);
+  const { errorSimulationEnabled } = useSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
