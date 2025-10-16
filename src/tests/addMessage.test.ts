@@ -1,37 +1,53 @@
-import { addMessage, AddMessageInput } from '@/domain/usecases/addMessage';
-import { messageRepository } from '@/domain/repositories/MessageRepository';
-import { generateAIResponse } from '@/services/gemini';
-import type { Message } from '@/domain/entities/Message';
+// Mock dependencies BEFORE importing anything that uses them
+jest.mock("@/services/db", () => ({
+  supabase: {
+    from: jest.fn(),
+    auth: {
+      getUser: jest.fn(),
+      signInWithOtp: jest.fn(),
+      signOut: jest.fn(),
+    },
+  },
+  createClient: jest.fn(),
+}));
 
-// Mock dependencies
-jest.mock('@/domain/repositories/MessageRepository');
-jest.mock('@/services/gemini');
-jest.mock('@/services/sentry');
+jest.mock("@/services/gemini");
+jest.mock("@/services/sentry");
 
-describe('addMessage use case', () => {
-  const mockUserId = 'user-123';
-  const mockSessionId = 'session-456';
-  const mockUserContent = 'Hello, AI!';
-  const mockAiContent = 'Hello! How can I help you today?';
+// Now import the modules
+import { addMessage, AddMessageInput } from "@/domain/usecases/addMessage";
+import { messageRepository } from "@/domain/repositories/MessageRepository";
+import { generateAIResponse } from "@/services/gemini";
+import type { Message } from "@/domain/entities/Message";
+
+// Mock the repository methods
+jest.spyOn(messageRepository, "create");
+jest.spyOn(messageRepository, "getBySessionId");
+
+describe("addMessage use case", () => {
+  const mockUserId = "user-123";
+  const mockSessionId = "session-456";
+  const mockUserContent = "Hello, AI!";
+  const mockAiContent = "Hello! How can I help you today?";
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should successfully add user message and get AI response', async () => {
+  it("should successfully add user message and get AI response", async () => {
     // Arrange
     const mockUserMessage: Message = {
-      id: 'msg-user-1',
+      id: "msg-user-1",
       sessionId: mockSessionId,
-      role: 'user',
+      role: "user",
       content: mockUserContent,
       createdAt: new Date().toISOString(),
     };
 
     const mockAiMessage: Message = {
-      id: 'msg-ai-1',
+      id: "msg-ai-1",
       sessionId: mockSessionId,
-      role: 'assistant',
+      role: "assistant",
       content: mockAiContent,
       createdAt: new Date().toISOString(),
     };
@@ -77,7 +93,7 @@ describe('addMessage use case', () => {
       1,
       {
         sessionId: mockSessionId,
-        role: 'user',
+        role: "user",
         content: mockUserContent,
       },
       mockUserId
@@ -88,7 +104,7 @@ describe('addMessage use case', () => {
       2,
       {
         sessionId: mockSessionId,
-        role: 'assistant',
+        role: "assistant",
         content: mockAiContent,
       },
       mockUserId
@@ -103,12 +119,12 @@ describe('addMessage use case', () => {
     });
   });
 
-  it('should handle AI service failure and still return messages', async () => {
+  it("should handle AI service failure and still return messages", async () => {
     // Arrange
     const mockUserMessage: Message = {
-      id: 'msg-user-2',
+      id: "msg-user-2",
       sessionId: mockSessionId,
-      role: 'user',
+      role: "user",
       content: mockUserContent,
       createdAt: new Date().toISOString(),
     };
@@ -117,9 +133,9 @@ describe('addMessage use case', () => {
       "I apologize, but I'm having trouble processing your request right now.";
 
     const mockAiMessage: Message = {
-      id: 'msg-ai-2',
+      id: "msg-ai-2",
       sessionId: mockSessionId,
-      role: 'assistant',
+      role: "assistant",
       content: mockFallbackContent,
       createdAt: new Date().toISOString(),
     };
@@ -136,7 +152,7 @@ describe('addMessage use case', () => {
     (generateAIResponse as jest.Mock).mockResolvedValue({
       content: mockFallbackContent,
       success: false,
-      error: 'Simulated API failure',
+      error: "Simulated API failure",
     });
 
     const input: AddMessageInput = {
@@ -150,14 +166,14 @@ describe('addMessage use case', () => {
 
     // Assert
     expect(result.success).toBe(false);
-    expect(result.error).toBe('Simulated API failure');
+    expect(result.error).toBe("Simulated API failure");
     expect(result.userMessage).toEqual(mockUserMessage);
     expect(result.aiMessage.content).toBe(mockFallbackContent);
   });
 
-  it('should propagate errors from message repository', async () => {
+  it("should propagate errors from message repository", async () => {
     // Arrange
-    const error = new Error('Database connection failed');
+    const error = new Error("Database connection failed");
     (messageRepository.create as jest.Mock).mockRejectedValue(error);
 
     const input: AddMessageInput = {
@@ -167,10 +183,8 @@ describe('addMessage use case', () => {
     };
 
     // Act & Assert
-    await expect(addMessage(input)).rejects.toThrow('Database connection failed');
+    await expect(addMessage(input)).rejects.toThrow(
+      "Database connection failed"
+    );
   });
 });
-
-
-
-
