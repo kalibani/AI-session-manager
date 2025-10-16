@@ -7,7 +7,14 @@ import { MessageInput } from "./MessageInput";
 import { MarkdownMessage } from "./MarkdownMessage";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, User, Bot, RefreshCw, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  User,
+  Bot,
+  RefreshCw,
+  AlertTriangle,
+} from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -75,6 +82,16 @@ export function SessionDetail({ sessionId }: SessionDetailProps) {
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
+
+      {errorSimulationEnabled && (
+        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+          <p className="text-sm text-destructive">
+            <strong>Error Simulation Active:</strong> ~15% of AI requests will
+            fail for demo purposes
+          </p>
+        </div>
+      )}
 
       <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
