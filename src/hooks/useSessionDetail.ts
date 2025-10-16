@@ -51,7 +51,6 @@ export const useSessionDetail = (sessionId: string) => {
           return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const content = message.parts
           .filter((part: any) => part.type === "text")
           .map((part: any) => part.text)
@@ -185,7 +184,6 @@ export const useSessionDetail = (sessionId: string) => {
     id: msg.id,
     sessionId,
     role: msg.role as "user" | "assistant",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: msg.parts
       .filter((part: any) => part.type === "text")
       .map((part: any) => part.text)

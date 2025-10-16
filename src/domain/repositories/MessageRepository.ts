@@ -67,7 +67,6 @@ export class MessageRepository {
         content: input.content,
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from("messages")
         .insert(insertData as any)

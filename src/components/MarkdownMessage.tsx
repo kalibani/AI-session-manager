@@ -73,7 +73,6 @@ export function MarkdownMessage({ content }: MarkdownMessageProps) {
                 {language}
               </div>
               <SyntaxHighlighter
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 style={codeTheme as any}
                 language={language}
                 PreTag="div"

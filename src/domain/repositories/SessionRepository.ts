@@ -106,7 +106,6 @@ export class SessionRepository {
         title: input.title,
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await supabase
         .from("sessions")
         .insert(insertData as any)
@@ -142,7 +141,6 @@ export class SessionRepository {
         title: input.title,
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("sessions")
         .update(updateData)
