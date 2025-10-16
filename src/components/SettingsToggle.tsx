@@ -43,7 +43,7 @@ export function SettingsToggle() {
         </DropdownMenuItem>
         {errorSimulationEnabled && (
           <div className="px-2 py-1.5 text-xs text-muted-foreground">
-            15% of AI requests will fail
+            40% of AI requests will fail
           </div>
         )}
       </DropdownMenuContent>

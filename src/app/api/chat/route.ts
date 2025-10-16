@@ -49,8 +49,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Simulate error if enabled (15% chance)
-    if (errorSimulation && Math.random() < 0.15) {
+    // Simulate error if enabled (40% chance)
+    if (errorSimulation && Math.random() < 0.4) {
       return NextResponse.json(
         { error: "Simulated API failure for testing" },
         { status: 500 }

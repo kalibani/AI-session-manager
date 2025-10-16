@@ -87,7 +87,7 @@ export function SessionDetail({ sessionId }: SessionDetailProps) {
         <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
           <p className="text-sm text-destructive">
-            <strong>Error Simulation Active:</strong> ~15% of AI requests will
+            <strong>Error Simulation Active:</strong> ~40% of AI requests will
             fail for demo purposes
           </p>
         </div>
