@@ -18,15 +18,16 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 );
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [errorSimulationEnabled, setErrorSimulationEnabled] = useState(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("errorSimulationEnabled");
-    if (saved !== null) {
-      setErrorSimulationEnabled(JSON.parse(saved));
+  // Initialize state directly from localStorage to avoid timing issues
+  const [errorSimulationEnabled, setErrorSimulationEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("errorSimulationEnabled");
+      if (saved !== null) {
+        return JSON.parse(saved);
+      }
     }
-  }, []);
+    return false;
+  });
 
   // Save to localStorage when changed
   const handleSetErrorSimulation = (enabled: boolean) => {

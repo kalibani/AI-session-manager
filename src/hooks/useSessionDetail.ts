@@ -18,6 +18,7 @@ export const useSessionDetail = (sessionId: string) => {
   const { user } = useAuth();
   const { errorSimulationEnabled } = useSettings();
   const userRef = useRef<User | null>(null);
+  const errorSimulationRef = useRef<boolean>(errorSimulationEnabled);
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +40,10 @@ export const useSessionDetail = (sessionId: string) => {
     id: sessionId, // Use sessionId as the chat ID for persistence
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: {
+      body: () => ({
         sessionId,
-        errorSimulation: errorSimulationEnabled,
-      },
+        errorSimulation: errorSimulationRef.current,
+      }),
     }),
     onFinish: async ({ message }) => {
       try {
