@@ -5,6 +5,7 @@ import { useSessionDetail } from "@/hooks/useSessionDetail";
 import { useSettings } from "@/contexts/SettingsContext";
 import { MessageInput } from "./MessageInput";
 import { MarkdownMessage } from "./MarkdownMessage";
+import { TypingIndicator } from "./TypingIndicator";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,8 +25,15 @@ interface SessionDetailProps {
 }
 
 export function SessionDetail({ sessionId }: SessionDetailProps) {
-  const { session, messages, loading, sending, sendMessage, refreshDetail } =
-    useSessionDetail(sessionId);
+  const {
+    session,
+    messages,
+    loading,
+    sending,
+    isTyping,
+    sendMessage,
+    refreshDetail,
+  } = useSessionDetail(sessionId);
   const { errorSimulationEnabled } = useSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -144,6 +152,7 @@ export function SessionDetail({ sessionId }: SessionDetailProps) {
                   )}
                 </div>
               ))}
+              {isTyping && <TypingIndicator />}
               <div ref={messagesEndRef} />
             </>
           )}

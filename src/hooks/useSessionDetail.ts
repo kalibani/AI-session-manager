@@ -201,6 +201,7 @@ export const useSessionDetail = (sessionId: string) => {
     loading,
     error,
     sending: status === "streaming" || status === "submitted",
+    isTyping: status === "submitted", // AI is thinking, not streaming yet
     streamingMessage: "",
     sendMessage,
     refreshDetail,
